@@ -19,7 +19,10 @@ export default function App() {
 
   // 데이터 로드
   useEffect(() => {
-    Promise.all([fetch("/distances.json"), fetch("/stations-meta.json")])
+    Promise.all([
+      fetch(`${import.meta.env.BASE_URL}distances.json`),
+      fetch(`${import.meta.env.BASE_URL}stations-meta.json`),
+    ])
       .then(async ([a, b]) => [await a.json(), await b.json()])
       .then(([distJson, metaJson]) => {
         setDist(distJson);
@@ -113,7 +116,7 @@ export default function App() {
   const [fares, setFares] = useState(null);
 
   useEffect(() => {
-    fetch("/fares.json")
+    fetch(`${import.meta.env.BASE_URL}fares.json`)
       .then((r) => r.json())
       .then(setFares);
   }, []);
