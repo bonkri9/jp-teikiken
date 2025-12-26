@@ -1,0 +1,833 @@
+{
+  "lines": [
+    {
+      "id": "HIGASHIYAMA",
+      "name": "東山線"
+    },
+    {
+      "id": "MEIJO",
+      "name": "名城線"
+    },
+    {
+      "id": "MEIKO",
+      "name": "名港線"
+    },
+    {
+      "id": "TSURUMAI",
+      "name": "鶴舞線"
+    },
+    {
+      "id": "SAKURADORI",
+      "name": "桜通線"
+    }
+  ],
+  "stations": [
+    {
+      "name": "いりなか",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 13
+      }
+    },
+    {
+      "name": "ナゴヤドーム前矢田",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 13
+      }
+    },
+    {
+      "name": "一社",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 18
+      }
+    },
+    {
+      "name": "栄",
+      "lines": [
+        "HIGASHIYAMA",
+        "MEIJO"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 9,
+        "MEIJO": 4
+      }
+    },
+    {
+      "name": "塩釜口",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 15
+      }
+    },
+    {
+      "name": "覚王山",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 14
+      }
+    },
+    {
+      "name": "丸の内",
+      "lines": [
+        "TSURUMAI",
+        "SAKURADORI"
+      ],
+      "orders": {
+        "TSURUMAI": 5,
+        "SAKURADORI": 3
+      }
+    },
+    {
+      "name": "岩塚",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 2
+      }
+    },
+    {
+      "name": "亀島",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 6
+      }
+    },
+    {
+      "name": "久屋大通",
+      "lines": [
+        "MEIJO",
+        "SAKURADORI"
+      ],
+      "orders": {
+        "MEIJO": 5,
+        "SAKURADORI": 4
+      }
+    },
+    {
+      "name": "金山",
+      "lines": [
+        "MEIJO",
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIJO": 0,
+        "MEIKO": 0
+      }
+    },
+    {
+      "name": "原",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 17
+      }
+    },
+    {
+      "name": "御器所",
+      "lines": [
+        "TSURUMAI",
+        "SAKURADORI"
+      ],
+      "orders": {
+        "TSURUMAI": 11,
+        "SAKURADORI": 9
+      }
+    },
+    {
+      "name": "港区役所",
+      "lines": [
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIKO": 4
+      }
+    },
+    {
+      "name": "荒畑",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 10
+      }
+    },
+    {
+      "name": "高岳",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 5
+      }
+    },
+    {
+      "name": "高畑",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 0
+      }
+    },
+    {
+      "name": "国際センター",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 2
+      }
+    },
+    {
+      "name": "黒川",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 8
+      }
+    },
+    {
+      "name": "今池",
+      "lines": [
+        "HIGASHIYAMA",
+        "SAKURADORI"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 12,
+        "SAKURADORI": 7
+      }
+    },
+    {
+      "name": "砂田橋",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 14
+      }
+    },
+    {
+      "name": "桜山",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 10
+      }
+    },
+    {
+      "name": "桜本町",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 14
+      }
+    },
+    {
+      "name": "志賀本通",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 9
+      }
+    },
+    {
+      "name": "自由ヶ丘",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 16
+      }
+    },
+    {
+      "name": "車道",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 6
+      }
+    },
+    {
+      "name": "庄内通",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 2
+      }
+    },
+    {
+      "name": "庄内緑地公園",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 1
+      }
+    },
+    {
+      "name": "上社",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 19
+      }
+    },
+    {
+      "name": "上小田井",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 0
+      }
+    },
+    {
+      "name": "上前津",
+      "lines": [
+        "MEIJO",
+        "TSURUMAI"
+      ],
+      "orders": {
+        "MEIJO": 2,
+        "TSURUMAI": 8
+      }
+    },
+    {
+      "name": "上飯田",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 11
+      }
+    },
+    {
+      "name": "浄心",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 3
+      }
+    },
+    {
+      "name": "植田",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 16
+      }
+    },
+    {
+      "name": "新栄町",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 10
+      }
+    },
+    {
+      "name": "新瑞橋",
+      "lines": [
+        "MEIJO",
+        "SAKURADORI"
+      ],
+      "orders": {
+        "MEIJO": 23,
+        "SAKURADORI": 13
+      }
+    },
+    {
+      "name": "神沢",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 19
+      }
+    },
+    {
+      "name": "吹上",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 8
+      }
+    },
+    {
+      "name": "瑞穂運動場西",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 12
+      }
+    },
+    {
+      "name": "瑞穂運動場東",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 22
+      }
+    },
+    {
+      "name": "瑞穂区役所",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 11
+      }
+    },
+    {
+      "name": "星ヶ丘",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 17
+      }
+    },
+    {
+      "name": "西高蔵",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 28
+      }
+    },
+    {
+      "name": "赤池",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 19
+      }
+    },
+    {
+      "name": "千種",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 11
+      }
+    },
+    {
+      "name": "川名",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 12
+      }
+    },
+    {
+      "name": "浅間町",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 4
+      }
+    },
+    {
+      "name": "相生山",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 18
+      }
+    },
+    {
+      "name": "総合リハビリセンター",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 21
+      }
+    },
+    {
+      "name": "太閤通",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 0
+      }
+    },
+    {
+      "name": "大須観音",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 7
+      }
+    },
+    {
+      "name": "大曽根",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 12
+      }
+    },
+    {
+      "name": "池下",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 13
+      }
+    },
+    {
+      "name": "築地口",
+      "lines": [
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIKO": 5
+      }
+    },
+    {
+      "name": "茶屋ヶ坂",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 15
+      }
+    },
+    {
+      "name": "中村公園",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 3
+      }
+    },
+    {
+      "name": "中村日赤",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 4
+      }
+    },
+    {
+      "name": "鶴舞",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 9
+      }
+    },
+    {
+      "name": "鶴里",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 15
+      }
+    },
+    {
+      "name": "東海通",
+      "lines": [
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIKO": 3
+      }
+    },
+    {
+      "name": "東山公園",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 16
+      }
+    },
+    {
+      "name": "東別院",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 1
+      }
+    },
+    {
+      "name": "藤が丘",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 21
+      }
+    },
+    {
+      "name": "徳重",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 20
+      }
+    },
+    {
+      "name": "日比野",
+      "lines": [
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIKO": 1
+      }
+    },
+    {
+      "name": "熱田神宮西",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 27
+      }
+    },
+    {
+      "name": "熱田神宮伝馬町",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 26
+      }
+    },
+    {
+      "name": "八事",
+      "lines": [
+        "MEIJO",
+        "TSURUMAI"
+      ],
+      "orders": {
+        "MEIJO": 20,
+        "TSURUMAI": 14
+      }
+    },
+    {
+      "name": "八事日赤",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 19
+      }
+    },
+    {
+      "name": "八田",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 1
+      }
+    },
+    {
+      "name": "伏見",
+      "lines": [
+        "HIGASHIYAMA",
+        "TSURUMAI"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 8,
+        "TSURUMAI": 6
+      }
+    },
+    {
+      "name": "平安通",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 10
+      }
+    },
+    {
+      "name": "平針",
+      "lines": [
+        "TSURUMAI"
+      ],
+      "orders": {
+        "TSURUMAI": 18
+      }
+    },
+    {
+      "name": "堀田",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 25
+      }
+    },
+    {
+      "name": "本郷",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 20
+      }
+    },
+    {
+      "name": "本山",
+      "lines": [
+        "HIGASHIYAMA",
+        "MEIJO"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 15,
+        "MEIJO": 17
+      }
+    },
+    {
+      "name": "本陣",
+      "lines": [
+        "HIGASHIYAMA"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 5
+      }
+    },
+    {
+      "name": "妙音通",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 24
+      }
+    },
+    {
+      "name": "名古屋",
+      "lines": [
+        "HIGASHIYAMA",
+        "SAKURADORI"
+      ],
+      "orders": {
+        "HIGASHIYAMA": 7,
+        "SAKURADORI": 1
+      }
+    },
+    {
+      "name": "名古屋港",
+      "lines": [
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIKO": 6
+      }
+    },
+    {
+      "name": "名古屋城",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 6
+      }
+    },
+    {
+      "name": "名古屋大学",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 18
+      }
+    },
+    {
+      "name": "名城公園",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 7
+      }
+    },
+    {
+      "name": "鳴子北",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 17
+      }
+    },
+    {
+      "name": "野並",
+      "lines": [
+        "SAKURADORI"
+      ],
+      "orders": {
+        "SAKURADORI": 16
+      }
+    },
+    {
+      "name": "矢場町",
+      "lines": [
+        "MEIJO"
+      ],
+      "orders": {
+        "MEIJO": 3
+      }
+    },
+    {
+      "name": "六番町",
+      "lines": [
+        "MEIKO"
+      ],
+      "orders": {
+        "MEIKO": 2
+      }
+    }
+  ]
+}
