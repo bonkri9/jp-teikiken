@@ -6,6 +6,11 @@ import {
   calcCommuterPassCost,
   calcBreakEvenDays,
 } from "./utils/fare";
+import {
+  buildNeighborGraph,
+  dijkstraPath,
+  pathIncludesSegment,
+} from "./utils/route";
 
 export default function App() {
   const [dist, setDist] = useState(null); // distances.json
@@ -214,6 +219,59 @@ export default function App() {
 
     return { daily, m1, m3, m6, best };
   }, [fares, fareResult, km, workDays]);
+
+  const graph = useMemo(() => {
+    if (!dist || !meta) return null;
+    return buildNeighborGraph({ dist, meta });
+  }, [dist, meta]);
+
+  const route = useMemo(() => {
+    if (!graph || !from || !to) return null;
+    const r = dijkstraPath(graph, from, to);
+    if (r.km == null) return null;
+    return r; // { km, path }
+  }, [graph, from, to]);
+
+  const bestExtendedPass = useMemo(() => {
+    if (!fares || !route || !graph || !dist) return null;
+
+    const myZone = getZoneByKm(route.km, fares.distanceZones);
+    const myPassPrice = fares.commuterPass["1"][String(myZone)];
+
+    const stations = dist.stations ?? [];
+    let best = null;
+
+    for (let a = 0; a < stations.length; a++) {
+      for (let b = a + 1; b < stations.length; b++) {
+        const u = stations[a];
+        const v = stations[b];
+
+        const uv = dijkstraPath(graph, u, v);
+        if (uv.km == null) continue;
+
+        const zone = getZoneByKm(uv.km, fares.distanceZones);
+        const price = fares.commuterPass["1"][String(zone)];
+
+        // 같은 가격(=같은 구간 가격)이면서 내 구간을 포함하는지
+        if (price !== myPassPrice) continue;
+        if (!pathIncludesSegment(uv.path, from, to)) continue;
+
+        // "더 멀리" 기준: 경로 km가 가장 큰 것 선택
+        if (!best || uv.km > best.km) {
+          best = { from: u, to: v, km: uv.km, path: uv.path, zone, price };
+        }
+      }
+    }
+
+    // 내 구간 자체가 최적이면 굳이 추천 안 해도 됨(선택)
+    if (!best) return null;
+
+    const extraStations = Math.max(
+      0,
+      best.path.length - (route.path?.length ?? 0)
+    );
+    return { ...best, extraStations, myZone, myPassPrice };
+  }, [fares, route, graph, dist, from, to]);
 
   if (!dist || !meta) {
     return <div style={{ padding: 24 }}>loading...</div>;
@@ -438,6 +496,33 @@ export default function App() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {bestExtendedPass && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              border: "1px solid #ddd",
+              borderRadius: 8,
+            }}
+          >
+            <div style={{ fontWeight: 800, marginBottom: 6 }}>
+              같은 가격으로 더 넓게 커버하는 정기권(1개월 기준)
+            </div>
+
+            <div>
+              추천 구간: <b>{bestExtendedPass.from}</b> -{" "}
+              <b>{bestExtendedPass.to}</b>
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.85 }}>
+              가격: {bestExtendedPass.myPassPrice.toLocaleString()}円 (구간{" "}
+              {bestExtendedPass.myZone}区 동일)
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.85 }}>
+              커버 경로 역 수: {bestExtendedPass.path.length}개
             </div>
           </div>
         )}
