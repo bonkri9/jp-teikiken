@@ -1,281 +1,62 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatKm } from "./utils/format";
-import {
-  getZoneByKm,
-  calcRegularMonthlyCost,
-  calcCommuterPassCost,
-  calcBreakEvenDays,
-} from "./utils/fare";
-import {
-  buildNeighborGraph,
-  dijkstraPath,
-  pathIncludesSegment,
-} from "./utils/route";
+import { countTransfers } from "./utils/route";
+import { useNagoyaPassData } from "./hooks/useNagoyaPassData";
 
 export default function App() {
-  const [dist, setDist] = useState(null); // distances.json
-  const [meta, setMeta] = useState(null); // stations-meta.json
+  const { dist, meta, fares, stationsByLine, computeDerived } =
+    useNagoyaPassData();
 
   const [fromLine, setFromLine] = useState("ALL");
   const [toLine, setToLine] = useState("ALL");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [workDays, setWorkDays] = useState(20);
+  const [isMyPathOpen, setIsMyPathOpen] = useState(false);
+  const [isPassPathOpen, setIsPassPathOpen] = useState(false);
 
-  // 데이터 로드
+  // 초기 from/to 세팅 (dist 로드 후)
   useEffect(() => {
-    Promise.all([
-      fetch(`${import.meta.env.BASE_URL}distances.json`),
-      fetch(`${import.meta.env.BASE_URL}stations-meta.json`),
-    ])
-      .then(async ([a, b]) => [await a.json(), await b.json()])
-      .then(([distJson, metaJson]) => {
-        setDist(distJson);
-        setMeta(metaJson);
-
-        const stations = distJson.stations ?? [];
-        setFrom(stations[0] ?? "");
-        setTo(stations[1] ?? stations[0] ?? "");
-      });
-  }, []);
-
-  // station name -> meta 매핑
-  const stationMetaMap = useMemo(() => {
-    const map = new Map();
-    if (!meta) return map;
-    for (const s of meta.stations) {
-      map.set(s.name, s);
-    }
-    return map;
-  }, [meta]);
-
-  // 노선별 역 목록 (order 기준 정렬)
-  const stationsByLine = useMemo(() => {
-    if (!dist || !meta) return { ALL: [] };
-
-    const allStations = dist.stations ?? [];
-    const result = { ALL: [...allStations] };
-
-    for (const line of meta.lines) {
-      const lineId = line.id;
-
-      const filtered = allStations
-        .filter((name) => {
-          const m = stationMetaMap.get(name);
-          return m?.lines?.includes(lineId);
-        })
-        .sort((a, b) => {
-          const ma = stationMetaMap.get(a);
-          const mb = stationMetaMap.get(b);
-
-          const oa = ma?.orders?.[lineId];
-          const ob = mb?.orders?.[lineId];
-
-          // 둘 다 order 있으면 order 기준
-          if (oa != null && ob != null) return oa - ob;
-          // 하나만 있으면 있는 쪽 우선
-          if (oa != null) return -1;
-          if (ob != null) return 1;
-          // 둘 다 없으면 이름순
-          return a.localeCompare(b, "ja");
-        });
-
-      result[lineId] = filtered;
-    }
-
-    return result;
-  }, [dist, meta, stationMetaMap]);
+    if (!dist) return;
+    const stations = dist.stations ?? [];
+    setFrom((prev) => prev || stations[0] || "");
+    setTo((prev) => prev || stations[1] || stations[0] || "");
+  }, [dist]);
 
   // 노선 변경 시 역 보정
   useEffect(() => {
     const list = stationsByLine[fromLine] ?? [];
-    if (list.length && !list.includes(from)) {
-      setFrom(list[0]);
-    }
-  }, [fromLine, stationsByLine]); // eslint-disable-line
+    if (list.length && from && !list.includes(from)) setFrom(list[0]);
+    if (list.length && !from) setFrom(list[0] ?? "");
+  }, [fromLine, stationsByLine, from]);
 
   useEffect(() => {
     const list = stationsByLine[toLine] ?? [];
-    if (list.length && !list.includes(to)) {
-      setTo(list[0]);
-    }
-  }, [toLine, stationsByLine]); // eslint-disable-line
+    if (list.length && to && !list.includes(to)) setTo(list[0]);
+    if (list.length && !to) setTo(list[0] ?? "");
+  }, [toLine, stationsByLine, to]);
 
-  // 최소 거리 계산
-  const km = useMemo(() => {
-    if (!dist || !from || !to) return null;
+  const derived = useMemo(
+    () => computeDerived({ from, to, workDays }),
+    [computeDerived, from, to, workDays]
+  );
 
-    let best = Infinity;
-    for (const e of dist.edges) {
-      if (
-        (e.from === from && e.to === to) ||
-        (e.from === to && e.to === from)
-      ) {
-        if (e.km < best) best = e.km;
-      }
-    }
-    return Number.isFinite(best) ? best : null;
-  }, [dist, from, to]);
-
-  // fares.json 로드
-  const [fares, setFares] = useState(null);
+  const {
+    route,
+    km,
+    fareResult,
+    passAnalysis,
+    bestExtendedPass,
+    myTransferSet,
+    passTransferSet,
+  } = derived ?? {};
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}fares.json`)
-      .then((r) => r.json())
-      .then(setFares);
-  }, []);
+    setIsPassPathOpen(false);
+    setIsMyPathOpen(false);
+  }, [from, to, fromLine, toLine]);
 
-  // 비용 계산 결과
-  const fareResult = useMemo(() => {
-    if (!fares || km == null) return null;
-
-    return {
-      regular: calcRegularMonthlyCost({
-        km,
-        days: workDays,
-        fares,
-      }),
-      commuter1: calcCommuterPassCost({
-        km,
-        months: 1,
-        fares,
-      }),
-      commuter3: calcCommuterPassCost({
-        km,
-        months: 3,
-        fares,
-      }),
-      commuter6: calcCommuterPassCost({
-        km,
-        months: 6,
-        fares,
-      }),
-    };
-  }, [fares, km, workDays]);
-
-  const passAnalysis = useMemo(() => {
-    if (!fares || !fareResult || km == null) return null;
-
-    const be1 = calcBreakEvenDays({ km, months: 1, fares });
-    const be3 = calcBreakEvenDays({ km, months: 3, fares });
-    const be6 = calcBreakEvenDays({ km, months: 6, fares });
-
-    const daily = be1.daily;
-
-    const analyze = (months, passPrice, breakEvenDaysTotal) => {
-      const actualDaysTotal = workDays * months;
-      const icCost = daily * actualDaysTotal;
-
-      const diff = icCost - passPrice; // 양수면 정기권이 이득
-
-      if (diff >= 0) {
-        return {
-          months,
-          status: "pass_better",
-          diffYen: diff,
-          breakEvenDays: breakEvenDaysTotal,
-          extraDaysBeyondBreakEven: Math.max(
-            0,
-            actualDaysTotal - breakEvenDaysTotal
-          ),
-          moreDaysToBreakEven: 0,
-        };
-      }
-
-      return {
-        months,
-        status: "ic_better",
-        diffYen: -diff,
-        breakEvenDays: breakEvenDaysTotal,
-        moreDaysToBreakEven: Math.max(0, breakEvenDaysTotal - actualDaysTotal),
-        extraDaysBeyondBreakEven: 0,
-      };
-    };
-
-    const m1 = analyze(1, fareResult.commuter1.price, be1.days);
-    const m3 = analyze(3, fareResult.commuter3.price, be3.days);
-    const m6 = analyze(6, fareResult.commuter6.price, be6.days);
-
-    // 추천 계산 (중복 없이 m1/m3/m6만 사용)
-    const best = (() => {
-      const arr = [m1, m3, m6];
-
-      const passBetter = arr.filter((x) => x.status === "pass_better");
-      if (passBetter.length > 0) {
-        passBetter.sort((a, b) => b.diffYen - a.diffYen);
-        return {
-          type: "pass",
-          months: passBetter[0].months,
-          yen: passBetter[0].diffYen,
-        };
-      }
-
-      // 정기권이 전부 손해면: "정기권을 사지 않는 것" 추천
-      // 참고용으로 "가장 덜 손해" 정기권도 함께 제공
-      arr.sort((a, b) => a.diffYen - b.diffYen);
-      return { type: "ic", months: arr[0].months, yen: arr[0].diffYen };
-    })();
-
-    return { daily, m1, m3, m6, best };
-  }, [fares, fareResult, km, workDays]);
-
-  const graph = useMemo(() => {
-    if (!dist || !meta) return null;
-    return buildNeighborGraph({ dist, meta });
-  }, [dist, meta]);
-
-  const route = useMemo(() => {
-    if (!graph || !from || !to) return null;
-    const r = dijkstraPath(graph, from, to);
-    if (r.km == null) return null;
-    return r; // { km, path }
-  }, [graph, from, to]);
-
-  const bestExtendedPass = useMemo(() => {
-    if (!fares || !route || !graph || !dist) return null;
-
-    const myZone = getZoneByKm(route.km, fares.distanceZones);
-    const myPassPrice = fares.commuterPass["1"][String(myZone)];
-
-    const stations = dist.stations ?? [];
-    let best = null;
-
-    for (let a = 0; a < stations.length; a++) {
-      for (let b = a + 1; b < stations.length; b++) {
-        const u = stations[a];
-        const v = stations[b];
-
-        const uv = dijkstraPath(graph, u, v);
-        if (uv.km == null) continue;
-
-        const zone = getZoneByKm(uv.km, fares.distanceZones);
-        const price = fares.commuterPass["1"][String(zone)];
-
-        // 같은 가격(=같은 구간 가격)이면서 내 구간을 포함하는지
-        if (price !== myPassPrice) continue;
-        if (!pathIncludesSegment(uv.path, from, to)) continue;
-
-        // "더 멀리" 기준: 경로 km가 가장 큰 것 선택
-        if (!best || uv.km > best.km) {
-          best = { from: u, to: v, km: uv.km, path: uv.path, zone, price };
-        }
-      }
-    }
-
-    // 내 구간 자체가 최적이면 굳이 추천 안 해도 됨(선택)
-    if (!best) return null;
-
-    const extraStations = Math.max(
-      0,
-      best.path.length - (route.path?.length ?? 0)
-    );
-    return { ...best, extraStations, myZone, myPassPrice };
-  }, [fares, route, graph, dist, from, to]);
-
-  if (!dist || !meta) {
-    return <div style={{ padding: 24 }}>loading...</div>;
-  }
+  if (!dist || !meta) return <div style={{ padding: 24 }}>loading...</div>;
 
   return (
     <div style={{ padding: 24, fontFamily: "system-ui" }}>
@@ -351,6 +132,88 @@ export default function App() {
             </p>
           )}
         </div>
+        {/* 내 구간 경로(아코디언) */}
+        {route && (
+          <div style={{ marginTop: 6 }}>
+            <button
+              type="button"
+              onClick={() => setIsMyPathOpen((v) => !v)}
+              style={{
+                padding: "6px 10px",
+                border: "1px solid #ccc",
+                borderRadius: 6,
+                background: "#fff",
+                cursor: "pointer",
+                fontSize: 12,
+                color: "black",
+              }}
+            >
+              {isMyPathOpen ? "내 구간 경로 접기 ▲" : "내 구간 경로 보기 ▼"}
+            </button>
+
+            {isMyPathOpen && (
+              <div
+                style={{
+                  marginTop: 8,
+                  padding: 10,
+                  border: "1px solid #eee",
+                  borderRadius: 8,
+                  background: "#fafafa",
+                  color: "black",
+                }}
+              >
+                <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 6 }}>
+                  내 구간 경로(총 {route.path.length}역)
+                </div>
+                <div style={{ fontSize: 12, opacity: 0.85, marginBottom: 6 }}>
+                  커버 거리: {formatKm(route.km)} km / 환승:{" "}
+                  {countTransfers(route.segments)}회
+                </div>
+
+                <div style={{ lineHeight: 1.7 }}>
+                  {route.path.map((s, idx) => {
+                    const isTransfer = myTransferSet.has(idx);
+                    const isEnd = idx === route.path.length - 1;
+
+                    return (
+                      <span key={`${s}-${idx}`}>
+                        <span
+                          style={
+                            isTransfer
+                              ? {
+                                  fontWeight: 800,
+                                  textDecoration: "underline",
+                                }
+                              : undefined
+                          }
+                        >
+                          {s}
+                        </span>
+
+                        {isTransfer && (
+                          <span
+                            style={{
+                              marginLeft: 6,
+                              padding: "1px 6px",
+                              borderRadius: 999,
+                              border: "1px solid #ddd",
+                              fontSize: 11,
+                              opacity: 0.9,
+                            }}
+                          >
+                            환승
+                          </span>
+                        )}
+
+                        {!isEnd ? " → " : ""}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 출근 일수 입력 */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -372,7 +235,7 @@ export default function App() {
           <span>일 / 월</span>
         </div>
 
-        {fares && fareResult && km != null && (
+        {fareResult && km != null && (
           <div
             style={{
               marginTop: 12,
@@ -523,6 +386,90 @@ export default function App() {
             </div>
             <div style={{ fontSize: 12, opacity: 0.85 }}>
               커버 경로 역 수: {bestExtendedPass.path.length}개
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.85 }}>
+              {bestExtendedPass.extraStations > 0
+                ? `내 구간 대비 추가 커버: ${bestExtendedPass.extraStations}역`
+                : "내 구간 그대로가 가장 효율적인 정기권 구간입니다"}
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.85 }}>
+              커버 거리: {formatKm(bestExtendedPass.km)} km / 환승:{" "}
+              {countTransfers(bestExtendedPass.segments)}회
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <button
+                type="button"
+                onClick={() => setIsPassPathOpen((v) => !v)}
+                style={{
+                  padding: "6px 10px",
+                  border: "1px solid #ccc",
+                  borderRadius: 6,
+                  background: "#fff",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  color: "black",
+                }}
+              >
+                {isPassPathOpen ? "경로 접기 ▲" : "경로 보기 ▼"}
+              </button>
+
+              {isPassPathOpen && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    padding: 10,
+                    border: "1px solid #eee",
+                    borderRadius: 8,
+                    background: "#fafafa",
+                    color: "black",
+                  }}
+                >
+                  <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 6 }}>
+                    경로(총 {bestExtendedPass.path.length}역)
+                  </div>
+
+                  <div style={{ lineHeight: 1.7 }}>
+                    {bestExtendedPass.path.map((s, idx) => {
+                      const isTransfer = passTransferSet.has(idx);
+                      const isEnd = idx === bestExtendedPass.path.length - 1;
+
+                      return (
+                        <span key={`${s}-${idx}`}>
+                          <span
+                            style={
+                              isTransfer
+                                ? {
+                                    fontWeight: 800,
+                                    textDecoration: "underline",
+                                  }
+                                : undefined
+                            }
+                          >
+                            {s}
+                          </span>
+
+                          {isTransfer && (
+                            <span
+                              style={{
+                                marginLeft: 6,
+                                padding: "1px 6px",
+                                borderRadius: 999,
+                                border: "1px solid #ddd",
+                                fontSize: 11,
+                                opacity: 0.9,
+                              }}
+                            >
+                              환승
+                            </span>
+                          )}
+
+                          {!isEnd ? " → " : ""}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
